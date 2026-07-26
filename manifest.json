@@ -1,6 +1,6 @@
 {
-  "name": "Forge — Treino do Thiago",
-  "short_name": "Forge",
+  "name": "App Academia",
+  "short_name": "App Academia",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f7f9fc",
@@ -9,12 +9,14 @@
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
