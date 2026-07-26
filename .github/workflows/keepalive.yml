@@ -1,0 +1,32 @@
+name: Supabase Keep-Alive
+
+# Evita que o projeto Supabase (plano free) hiberne após 7 dias sem atividade.
+# Faz uma consulta leve à API REST (tabela public.ping) em dias alternados.
+# A chave usada é a "anon public" — a mesma já embutida no app (segura, protegida por RLS).
+
+on:
+  schedule:
+    # Seg, Qua e Sex às 06:37 UTC (folga larga dentro da janela de 7 dias)
+    - cron: '37 6 * * 1,3,5'
+  workflow_dispatch: {}   # permite rodar manualmente pela aba Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST (mantém o projeto ativo)
+        env:
+          SUPABASE_URL: https://dbryvxbdgqzaupjdkohn.supabase.co
+          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRicnl2eGJkZ3F6YXVwamRrb2huIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwMTI0NTksImV4cCI6MjEwMDU4ODQ1OX0.DCyHGhZONoHnELEiczNrVMGae_W26qRxK1fKqsg0eAk
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /dev/null -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/ping?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "Supabase ping status: $code"
+          if [ "$code" != "200" ]; then
+            echo "::error::Ping falhou (esperado HTTP 200, veio $code)"
+            exit 1
+          fi
+          echo "OK — projeto mantido ativo."
